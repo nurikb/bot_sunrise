@@ -62,7 +62,7 @@ def getMessage():
 @server.route("/")
 def webhook():
     client.remove_webhook()
-    client.set_webhook(url='https://sunrise-bot.herokuapp.com/')
+    client.set_webhook(url='https://bot-sunrise-1.herokuapp.com/')
     return "!", 200
 
 
