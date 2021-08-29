@@ -4,22 +4,24 @@ import requests
 from bs4 import BeautifulSoup
 from flask import Flask, request
 import os
+from fake_useragent import UserAgent
+
+
+ua = UserAgent()
 
 
 client = telebot.TeleBot(token=token)
 server = Flask(__name__)
 
-user_agency = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 OPR/78.0.4093.147'
-
-# https://api.telegram.org/bot1550057543:AAGsIiMfET1vqwX74kFdpaIVI79MwMnAF0w/sendmessage?chat_id=472745426&text=hello%20world
 URL = 'https://api.telegram.org/bot' + token + '/'
 
 
 def get_html_data(name):
     search_url = 'https://rezka.ag/search/?do=search&subaction=search&q=' + name
-    header = {'User-Agent': user_agency}
+    header = {'User-Agent': ua}
 
     r = requests.get(search_url, headers=header)
+    print(r.request.body)
     return r.text
 
 
@@ -55,18 +57,16 @@ def get_text(message):
 
 @server.route("/" + token, methods=['POST'])
 def getMessage():
-    client.process_new_messages([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
-    return "!", 200
+    client.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    return "get message", 200
 
 
 @server.route("/")
 def webhook():
     client.remove_webhook()
-    client.set_webhook(url='https://bot-sunrise-1.herokuapp.com/')
-    return "!", 200
+    client.set_webhook(url='https://sunrise-bot.herokuapp.com/'+ token)
+    return "set token", 200
 
 
 if __name__ == '__main__':
     server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
-
-
